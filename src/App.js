@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import './App.css';
+import Notification from './components/Notification'
+import './App.css'
 
 
 const App = () => {
@@ -11,6 +12,7 @@ const App = () => {
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
+  const [notification, setNotification] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -39,14 +41,14 @@ const App = () => {
 
       window.localStorage.setItem(
         'loggedNoteappUser', JSON.stringify(user)
-      ) 
+      )
 
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('Wrong credentials')
+      setErrorMessage('Wrong username or password')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -133,6 +135,12 @@ const App = () => {
         setAuthor('')
         setUrl('')
       })
+    setNotification(
+      `A new blog ${title} by ${author} added`
+    )
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
   }
 
   return (
@@ -140,12 +148,14 @@ const App = () => {
       {user === null ?
         <div>
           <h2>Blogs Application</h2>
+          <Notification message={errorMessage}/>
           <h2>Login</h2>
           {loginForm()}
         </div>
         :
         <div>
           <h2>Blogs Application</h2>
+          <Notification message={notification}/>
           <p>
             {user.name} logged in
             <button onClick={handleLogout}>Logout</button>
@@ -169,7 +179,7 @@ const App = () => {
 
 
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
