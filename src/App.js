@@ -3,6 +3,9 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
+import LoginForm from './components/LoginForm'
+import BlogForm from './components/BlogForm'
+import Togglable from './components/Togglable'
 import './App.css'
 
 
@@ -21,7 +24,23 @@ const App = () => {
     blogService
       .getAll()
       .then(initialBlogs => setBlogs(initialBlogs))
-  }, [])
+  }, [blogs])
+
+  const compare = (a, b) => {
+    const blogA = a.likes
+    const blogB = b.likes
+
+    let comparison = 0
+    if (blogA > blogB) {
+      comparison = 1
+    } else if (blogA < blogB) {
+      comparison = -1
+    }
+    return comparison * -1
+  }
+
+  blogs.sort(compare)
+
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
@@ -64,63 +83,41 @@ const App = () => {
     setPassword('')
   }
 
-
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
+  const loginForm = () => {
+    return (
+      <Togglable buttonLabel='login'>
+        <LoginForm
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUsername(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+          handleSubmit={handleLogin}
         />
-      </div>
-      <div>
-        password
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
-  )
-
-  const blogForm = () => (
-    <form onSubmit={addBlog}>
-      title:<input
-        value={title}
-        onChange={handleTitleChange}
-      /> <br />
-      author:<input
-        value={author}
-        onChange={handleAuthorChange}
-      /> <br />
-      url:<input
-        value={url}
-        onChange={handleUrlChange}
-      /> <br />
-      <button type="submit">Create</button>
-    </form>
-  )
-
-  const handleTitleChange = (event) => {
-    setTitle(event.target.value)
+      </Togglable>
+    )
   }
 
-  const handleAuthorChange = (event) => {
-    setAuthor(event.target.value)
-  }
+  const blogFormRef = React.createRef()
 
-  const handleUrlChange = (event) => {
-    setUrl(event.target.value)
+  const blogForm = () => {
+    return (
+      <Togglable buttonLabel='new blog' ref={blogFormRef}>
+        <BlogForm
+          handleSubmit={addBlog}
+          title={title}
+          author={author}
+          url={url}
+          handleAuthorChange={({ target }) => setAuthor(target.value)}
+          handleTitleChange={({ target }) => setTitle(target.value)}
+          handleUrlChange={({ target }) => setUrl(target.value)}
+        />
+      </Togglable>
+    )
   }
 
   const addBlog = (event) => {
     event.preventDefault()
+    blogFormRef.current.toggleVisibility()
     const blogObject = {
       title: title,
       author: author,
@@ -164,20 +161,15 @@ const App = () => {
           {blogForm()}
           <h2>List of blogs in database</h2>
           <ul>
-            {blogs.map(b =>
+            {blogs.map(blog =>
               <Blog
-                key={b.id}
-                blog={b}
+                key={blog.id}
+                blog={blog}
               />
             )}
           </ul>
         </div>
       }
-
-
-
-
-
     </div>
   )
 }
