@@ -44,9 +44,9 @@ const Blog = ({ blog, loggedUser }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className="view">
       {show ?
-        <div>
+        <div className="shown">
           <div onClick={toggleShow}>
             {blog.title} {blog.author}
           </div>
@@ -56,7 +56,7 @@ const Blog = ({ blog, loggedUser }) => {
           {deleteButton()}
         </div>
         :
-        <div onClick={toggleShow}>
+        <div onClick={toggleShow} className="hidden">
           {blog.title} {blog.author}
         </div>
       }
