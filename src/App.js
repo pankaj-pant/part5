@@ -21,9 +21,11 @@ const App = () => {
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    blogService
-      .getAll()
-      .then(initialBlogs => setBlogs(initialBlogs))
+    async function fetchData() {
+      const initialBlogs = await blogService.getAll()
+      setBlogs(initialBlogs)
+    }
+    fetchData()
   }, [blogs])
 
   const compare = (a, b) => {
@@ -68,6 +70,8 @@ const App = () => {
       setPassword('')
     } catch (exception) {
       setErrorMessage('Wrong username or password')
+      setUsername('')
+      setPassword('')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -115,29 +119,39 @@ const App = () => {
     )
   }
 
-  const addBlog = (event) => {
+  const addBlog = async (event) => {
     event.preventDefault()
-    blogFormRef.current.toggleVisibility()
-    const blogObject = {
-      title: title,
-      author: author,
-      url: url
+
+    try {
+      blogFormRef.current.toggleVisibility()
+      const blogObject = {
+        title: title,
+        author: author,
+        url: url
+      }
+
+      const data = await blogService.create(blogObject)
+      setBlogs(blogs.concat(data))
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+      setNotification(
+        `A new blog ${title} by ${author} added`
+      )
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
+    } catch (exception) {
+      setErrorMessage('Error: Please fill all input fields')
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
     }
 
-    blogService
-      .create(blogObject)
-      .then(data => {
-        setBlogs(blogs.concat(data))
-        setTitle('')
-        setAuthor('')
-        setUrl('')
-      })
-    setNotification(
-      `A new blog ${title} by ${author} added`
-    )
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
+
   }
 
   return (
@@ -153,6 +167,7 @@ const App = () => {
         <div>
           <h2>Blogs Application</h2>
           <Notification message={notification}/>
+          <Notification message={errorMessage}/>
           <p>
             {user.name} logged in
             <button onClick={handleLogout}>Logout</button>
@@ -165,6 +180,7 @@ const App = () => {
               <Blog
                 key={blog.id}
                 blog={blog}
+                loggedUser={user}
               />
             )}
           </ul>

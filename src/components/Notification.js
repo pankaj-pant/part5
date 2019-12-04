@@ -6,7 +6,7 @@ const Notification = ({ message }) => {
   }
 
   return (
-    <div className={message === 'Wrong username or password' ? 'error' : 'notification'}>
+    <div className={message === ('Wrong username or password') || message === ('Error: Please fill all input fields') ? 'error' : 'notification'}>
       {message}
     </div>
   )

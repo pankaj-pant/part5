@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, loggedUser }) => {
   const [show, setShow] = useState(false)
 
   const toggleShow = () => {
@@ -28,6 +28,21 @@ const Blog = ({ blog }) => {
     marginBottom: 5
   }
 
+  const handleDelete = (event) => {
+    const result = window.confirm(`remove blog ${blog.title} by ${blog.author}`)
+
+    if(result === true){
+      blogService
+        .deleteBlog(blog.id)
+    }
+  }
+
+  const deleteButton = () => {
+    if (loggedUser.name === blog.user.name){
+      return <button onClick={handleDelete}>remove</button>
+    }
+  }
+
   return (
     <div style={blogStyle}>
       {show ?
@@ -38,7 +53,7 @@ const Blog = ({ blog }) => {
           <a href={blog.url}>{blog.url}</a> <br/>
           {blog.likes} likes <button onClick={updateLikes}>like</button><br/>
           {`added by ${blog.user.name}`}<br />
-          <button onClick={() => window.confirm(`remove blog ${blog.title} by ${blog.author}`)}>remove</button>
+          {deleteButton()}
         </div>
         :
         <div onClick={toggleShow}>
