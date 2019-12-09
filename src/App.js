@@ -7,18 +7,24 @@ import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import './App.css'
+import useField from './hooks/index'
 
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+  //const [title, setTitle] = useState('')
+  //const [author, setAuthor] = useState('')
+  //const [url, setUrl] = useState('')
+  const title = useField('text')
+  const author = useField('text')
+  const url = useField('text')
   const [errorMessage, setErrorMessage] = useState(null)
   const [notification, setNotification] = useState(null)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  //const [username, setUsername] = useState('')
+  //const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const username = useField('text')
+  const password = useField('password')
 
   useEffect(() => {
     async function fetchData() {
@@ -57,7 +63,8 @@ const App = () => {
     event.preventDefault()
     try {
       const user = await loginService.login({
-        username, password,
+        username: username.value,
+        password: password.value
       })
 
       window.localStorage.setItem(
@@ -66,12 +73,16 @@ const App = () => {
 
       blogService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
+      username.reset()
+      password.reset()
+      //setUsername('')
+      //setPassword('')
     } catch (exception) {
       setErrorMessage('Wrong username or password')
-      setUsername('')
-      setPassword('')
+      username.reset()
+      password.reset()
+      //setUsername('')
+      //setPassword('')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -83,8 +94,10 @@ const App = () => {
     window.localStorage.removeItem('loggedNoteappUser')
     blogService.setToken(null)
     setUser(null)
-    setUsername('')
-    setPassword('')
+    username.reset()
+    password.reset()
+    //setUsername('')
+    //setPassword('')
   }
 
   const loginForm = () => {
@@ -93,8 +106,6 @@ const App = () => {
         <LoginForm
           username={username}
           password={password}
-          handleUsernameChange={({ target }) => setUsername(target.value)}
-          handlePasswordChange={({ target }) => setPassword(target.value)}
           handleSubmit={handleLogin}
         />
       </Togglable>
@@ -111,9 +122,9 @@ const App = () => {
           title={title}
           author={author}
           url={url}
-          handleAuthorChange={({ target }) => setAuthor(target.value)}
-          handleTitleChange={({ target }) => setTitle(target.value)}
-          handleUrlChange={({ target }) => setUrl(target.value)}
+          //handleAuthorChange={({ target }) => setAuthor(target.value)}
+          //handleTitleChange={({ target }) => setTitle(target.value)}
+          //handleUrlChange={({ target }) => setUrl(target.value)}
         />
       </Togglable>
     )
@@ -125,27 +136,33 @@ const App = () => {
     try {
       blogFormRef.current.toggleVisibility()
       const blogObject = {
-        title: title,
-        author: author,
-        url: url
+        title: title.value,
+        author: author.value,
+        url: url.value
       }
 
       const data = await blogService.create(blogObject)
       setBlogs(blogs.concat(data))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
+      title.reset()
+      author.reset()
+      url.reset()
+      //setTitle('')
+      //setAuthor('')
+      //setUrl('')
       setNotification(
-        `A new blog ${title} by ${author} added`
+        `A new blog ${title.value} by ${author.value} added`
       )
       setTimeout(() => {
         setNotification(null)
       }, 5000)
     } catch (exception) {
       setErrorMessage('Error: Please fill all input fields')
-      setTitle('')
-      setAuthor('')
-      setUrl('')
+      title.reset()
+      author.reset()
+      url.reset()
+      //setTitle('')
+      //setAuthor('')
+      //setUrl('')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)

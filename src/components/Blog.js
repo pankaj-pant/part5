@@ -8,7 +8,7 @@ const Blog = ({ blog, loggedUser }) => {
     setShow(!show)
   }
 
-  const updateLikes = (event) => {
+  const updateLikes = () => {
     const blogObject = {
       title: blog.title,
       author: blog.author,
@@ -28,7 +28,7 @@ const Blog = ({ blog, loggedUser }) => {
     marginBottom: 5
   }
 
-  const handleDelete = (event) => {
+  const handleDelete = () => {
     const result = window.confirm(`remove blog ${blog.title} by ${blog.author}`)
 
     if(result === true){

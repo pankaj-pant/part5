@@ -1,7 +1,6 @@
 import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
 import { render, fireEvent } from '@testing-library/react'
-import { prettyDOM } from '@testing-library/dom'
 import Blog from './Blog'
 
 test('only the name and author of the blog post are shown by default', () => {
